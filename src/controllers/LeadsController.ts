@@ -1,29 +1,48 @@
 import { Handler } from "express";
 import { prisma } from "../database";
 import { CreateLeadRequestSchema } from "./schemas/LeadsRequestSchema";
+import { HttpError } from "../erros/HttpError";
 
 export class LeadsController {
-  index: Handler =  async (req, res, next) => {
+  index: Handler = async (req, res, next) => {
     try {
-      const leads = await prisma.lead.findMany()
+      const leads = await prisma.lead.findMany();
 
-      res.json(leads)
+      res.json(leads);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  };
 
   create: Handler = async (req, res, next) => {
     try {
-      const body = CreateLeadRequestSchema.parse(req.body)
+      const body = CreateLeadRequestSchema.parse(req.body);
 
       const newLead = await prisma.lead.create({
-        data: body
-      })
+        data: body,
+      });
 
-      res.status(201).json(newLead)
+      res.status(201).json(newLead);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  };
+
+  show: Handler = async (req, res, next) => {
+    try {
+      const lead = await prisma.lead.findUnique({
+        where: { id: Number(req.params.id) },
+        include: {
+          groups: true,
+          campaigns: true,
+        },
+      });
+
+      if (!lead) throw new HttpError(404, "lead nao encontrado");
+
+      res.json(lead);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
