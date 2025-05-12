@@ -1,6 +1,9 @@
 import { Handler } from "express";
 import { prisma } from "../database";
-import { CreateLeadRequestSchema } from "./schemas/LeadsRequestSchema";
+import {
+  CreateLeadRequestSchema,
+  UpdateLeadRequestSchema,
+} from "./schemas/LeadsRequestSchema";
 import { HttpError } from "../erros/HttpError";
 
 export class LeadsController {
@@ -46,15 +49,40 @@ export class LeadsController {
     }
   };
 
-  delete: Handler = async (req, res, next) => {
+  update: Handler = async (req, res, next) => {
     try {
-      const lead = await prisma.lead.delete({
+      const body = UpdateLeadRequestSchema.parse(req.body);
+
+      const leadExists = await prisma.lead.findUnique({
         where: { id: Number(req.params.id) },
       });
 
-      if (!lead) throw new HttpError(404, "lead nao encontrado");
+      if (!leadExists) throw new HttpError(404, "lead nao encontrado");
 
-      res.json(lead);
+      const updatedLead = await prisma.lead.update({
+        data: body,
+        where: { id: Number(req.params.id) },
+      });
+
+      res.json(updatedLead);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  delete: Handler = async (req, res, next) => {
+    try {
+      const leadExists = await prisma.lead.findUnique({
+        where: { id: Number(req.params.id) },
+      });
+
+      if (!leadExists) throw new HttpError(404, "lead nao encontrado");
+
+      const detetedLead = await prisma.lead.delete({
+        where: { id: Number(req.params.id) },
+      });
+
+      res.json({ detetedLead });
     } catch (error) {
       next(error);
     }
