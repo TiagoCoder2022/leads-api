@@ -6,11 +6,25 @@ import { HttpError } from "../erros/HttpError";
 export class CampaignsController {
   index: Handler = async (req, res, next) => {
     try {
-      const campaigns = await prisma.campaign.findMany()
+      const campaigns = await prisma.campaign.findMany();
 
-      res.json(campaigns)
+      res.json(campaigns);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }  
+  };
+
+  create: Handler = async (req, res, next) => {
+    try {
+      const body = CreateCampaignsRequestSchema.parse(req.body);
+
+      const newCampaign = await prisma.campaign.create({
+        data: body,
+      });
+
+      res.status(201).json(newCampaign);
+    } catch (error) {
+      next(error);
+    }
+  };  
 }
