@@ -26,5 +26,21 @@ export class CampaignsController {
     } catch (error) {
       next(error);
     }
-  };  
+  };
+
+  show: Handler = async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+
+      const campaign = await prisma.campaign.findUnique({
+        where: { id },
+      });
+
+      if (!campaign) throw new HttpError(404, "Campaign not found");
+
+      res.json(campaign);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
