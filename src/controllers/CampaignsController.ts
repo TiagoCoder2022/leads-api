@@ -68,4 +68,22 @@ export class CampaignsController {
       next(error);
     }
   };
+
+  delete: Handler = async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+
+      const campaignExists = await prisma.campaign.findUnique({
+        where: { id },
+      });
+
+      if (!campaignExists) throw new HttpError(404, "Campaign not found");
+
+      const campaign = await prisma.campaign.delete({ where: { id } });
+
+      res.json(campaign);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
