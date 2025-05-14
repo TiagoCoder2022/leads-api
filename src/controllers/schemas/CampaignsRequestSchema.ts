@@ -13,3 +13,25 @@ export const UpdateCampaignsRequestSchema = z.object({
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
 })
+
+const LeadCampaignStatusEnum = z.enum([
+  "New",
+  "Engaged",
+  "FollowUp_Scheduled",
+  "Contacted",
+  "Qualified",
+  "Converted",
+  "Unresponsive",
+  "Disqualified",
+  "Re_Engaged",
+  "Opted_Out",
+]);
+
+export const GetCampaignLeadsRequestSchema = z.object({
+  page: z.string().optional(),
+  pageSize: z.string().optional(),
+  name: z.string().optional(),
+  status: LeadCampaignStatusEnum.optional(),
+  sortBy: z.enum(["name", "createdAt"]).optional(),
+  order: z.enum(["asc", "desc"]).optional(),
+});
