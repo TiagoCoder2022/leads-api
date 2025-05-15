@@ -31,8 +31,11 @@ router.put("/campaigns/:id", campaignsController.update);
 router.delete("/campaigns/:id", campaignsController.delete);
 
 router.get("/campaigns/:campaignId/leads", campaignLeadsController.getLeads)
-// router.post("/campaigns/:campaignId/leads", campaignLeadsController.addLead)
-// router.put("/campaigns/:campaignId/leads/:leadId", campaignLeadsController.updateLeadStatus)
+router.post("/campaigns/:campaignId/leads", campaignLeadsController.addLeads);
+router.put(
+  "/campaigns/:campaignId/leads/:leadId",
+  campaignLeadsController.updateLeadStatus
+);
 // router.delete("/campaigns/:campaignId/leads/:leadId", campaignLeadsController.removeLead)
 
 router.get("/test", async (req, res, next) => {

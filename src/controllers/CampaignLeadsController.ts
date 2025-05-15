@@ -3,6 +3,7 @@ import { Prisma } from "../generated/prisma";
 import {
   AddLeadRequestSchema,
   GetCampaignLeadsRequestSchema,
+  UpdateLeadStatusRequestSchema,
 } from "./schemas/CampaignsRequestSchema";
 import { prisma } from "../database";
 
@@ -83,6 +84,18 @@ export class CampaignLeadsController {
 
   updateLeadStatus: Handler = async (req, res, next) => {
     try {
+      const body = UpdateLeadStatusRequestSchema.parse(req.body);
+      const updatedLeadCampaign = await prisma.leadCampaign.update({
+        data: body,
+        where: {
+          leadId_campaignId: {
+            campaignId: Number(req.params.campaignId),
+            leadId: Number(req.params.leadId),
+          },
+        },
+      });
+
+      res.json(updatedLeadCampaign);
     } catch (error) {
       next(error);
     }
