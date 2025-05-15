@@ -35,3 +35,12 @@ export const GetCampaignLeadsRequestSchema = z.object({
   sortBy: z.enum(["name", "createdAt"]).optional(),
   order: z.enum(["asc", "desc"]).optional(),
 });
+
+export const AddLeadRequestSchema = z.object({
+  leadId: z.number(),
+  status: LeadCampaignStatusEnum.optional(),
+});
+
+export const UpdateLeadStatusRequestSchema = z.object({
+  status: LeadCampaignStatusEnum,
+});
