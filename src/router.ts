@@ -28,6 +28,7 @@ router.delete("/groups/:id", groupsController.delete);
 
 router.get("/groups/:groupId/leads", groupLeadsController.getLeads);
 router.post("/groups/:groupId/leads", groupLeadsController.addLead);
+router.put("/groups/:groupId/leads/:leadId", groupLeadsController.removeLead);
 
 router.get("/campaigns", campaignsController.index);
 router.post("/campaigns", campaignsController.create);

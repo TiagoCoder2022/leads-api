@@ -77,5 +77,23 @@ export class GroupLeadsController {
     }
   };
 
-  deleteLead: Handler = async (req, res, next) => {};
+  removeLead: Handler = async (req, res, next) => {
+    try {
+      const updatedGroup = await prisma.group.update({
+        where: { id: Number(req.params.groupId) },
+        data: {
+          leads: {
+            disconnect: {
+              id: Number(req.params.leadId),
+            },
+          },
+        },
+        include: { leads: true },
+      });
+
+      res.json(updatedGroup);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
