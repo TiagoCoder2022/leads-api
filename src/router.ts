@@ -36,7 +36,10 @@ router.put(
   "/campaigns/:campaignId/leads/:leadId",
   campaignLeadsController.updateLeadStatus
 );
-// router.delete("/campaigns/:campaignId/leads/:leadId", campaignLeadsController.removeLead)
+router.delete(
+  "/campaigns/:campaignId/leads/:leadId",
+  campaignLeadsController.removeLeads
+);
 
 router.get("/test", async (req, res, next) => {
  try {

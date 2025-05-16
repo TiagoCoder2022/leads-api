@@ -103,6 +103,16 @@ export class CampaignLeadsController {
 
   removeLeads: Handler = async (req, res, next) => {
     try {
+      const removedLeads = await prisma.leadCampaign.delete({
+        where: {
+          leadId_campaignId: {
+            campaignId: Number(req.params.campaignId),
+            leadId: Number(req.params.leadId),
+          },
+        },
+      });
+
+      res.json({ removedLeads });
     } catch (error) {
       next(error);
     }
