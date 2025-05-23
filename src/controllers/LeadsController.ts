@@ -78,13 +78,7 @@ export class LeadsController {
 
   show: Handler = async (req, res, next) => {
     try {
-      const lead = await prisma.lead.findUnique({
-        where: { id: Number(req.params.id) },
-        include: {
-          groups: true,
-          campaigns: true,
-        },
-      });
+      const lead = await this.leadsRepository.findById(Number(req.params.id));     
 
       if (!lead) throw new HttpError(404, "lead nao encontrado");
 
