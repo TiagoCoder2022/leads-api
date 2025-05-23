@@ -9,14 +9,23 @@ export class PrismaLeadsRepository implements LeadsRepository {
         name: {
           contains: params.where?.name?.like,
           equals: params.where?.name?.equals,
-          mode: params.where?.name?.mode
+          mode: params.where?.name?.mode,
         },
-        status: params.where?.status
+        status: params.where?.status,
+        groups: {
+          some: {
+            id: params.where?.groupId,
+          },
+        },
       },
-      orderBy: { [params.sortBy ?? "name"]: params.order},
+      orderBy: { [params.sortBy ?? "name"]: params.order },
       skip: params.offset,
-      take: params.limit
-    })
+      take: params.limit,
+      include: {
+        groups: params.include?.groups,
+        campaigns: params.include?.campaigns,
+      },
+    });
   }
 
   async findById(id: number): Promise<Lead | null> {
@@ -41,11 +50,16 @@ export class PrismaLeadsRepository implements LeadsRepository {
         name: {
           contains: where?.name?.like,
           equals: where?.name?.equals,
-          mode: where?.name?.mode
+          mode: where?.name?.mode,
         },
-        status: where?.status
+        status: where?.status,
+        groups: {
+          some: {
+            id: where?.groupId,
+          },
+        },
       },
-    })
+    });
   }
 
   async updateById(id: number, attributes: Partial<CreateLeadAttributes>): Promise<Lead> {

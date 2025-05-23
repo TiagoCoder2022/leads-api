@@ -4,10 +4,10 @@ import {
   UpdateGroupRequestSchema,
 } from "./schemas/GroupsRequestSchema";
 import { HttpError } from "../erros/HttpError";
-import { GroupRepository } from "../repositories/GroupsRepository";
+import { GroupsRepository } from "../repositories/GroupsRepository";
 
 export class GroupsController {
-  constructor(private readonly groupsRepository: GroupRepository) {}
+  constructor(private readonly groupsRepository: GroupsRepository) {}
 
   index: Handler = async (req, res, next) => {
     try {

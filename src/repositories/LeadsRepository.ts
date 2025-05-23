@@ -4,19 +4,24 @@ export type LeadStatus = "New" | "Contacted" | "Qualified" | "Converted" | "Unre
 
 export interface LeadWhereParams {
   name?: {
-    like?: string
-    equals?: string
-    mode?: "default" | "insensitive"
-  }
-  status?: LeadStatus
+    like?: string;
+    equals?: string;
+    mode?: "default" | "insensitive";
+  };
+  status?: LeadStatus;
+  groupId?: number;
 }
 
 export interface FindLeadsParams {
-  where?: LeadWhereParams
-  sortBy?: "name" | "status" | "createdAt"
-  order?: "asc" | "desc"
-  limit?: number
-  offset?: number
+  where?: LeadWhereParams;
+  sortBy?: "name" | "status" | "createdAt";
+  order?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+  include?: {
+    groups?: boolean;
+    campaigns?: boolean;
+  };
 }
 
 export interface CreateLeadAttributes {
