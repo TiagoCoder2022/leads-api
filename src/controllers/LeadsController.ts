@@ -66,10 +66,9 @@ export class LeadsController {
   create: Handler = async (req, res, next) => {
     try {
       const body = CreateLeadRequestSchema.parse(req.body);
+      if (!body.status) body.status = "New";
 
-      const newLead = await prisma.lead.create({
-        data: body,
-      });
+      const newLead = await this.leadsRepository.create(body);      
 
       res.status(201).json(newLead);
     } catch (error) {

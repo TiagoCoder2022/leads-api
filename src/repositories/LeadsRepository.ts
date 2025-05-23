@@ -20,10 +20,10 @@ export interface FindLeadsParams {
 }
 
 export interface CreateLeadAttributes {
-  name: string
-  email: string 
-  phone: string
-  status: LeadStatus
+  name: string;
+  email: string;
+  phone: string;
+  status?: LeadStatus;
 }
 
 export interface LeadsRepository {
