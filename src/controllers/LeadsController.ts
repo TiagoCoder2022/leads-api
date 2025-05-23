@@ -7,8 +7,18 @@ import {
 } from "./schemas/LeadsRequestSchema";
 import { HttpError } from "../erros/HttpError";
 import { Prisma } from "../generated/prisma";
+import {
+  LeadsRepository,
+  LeadWhereParams,
+} from "../repositories/LeadsRepository";
 
 export class LeadsController {
+  private leadsRepository: LeadsRepository;
+
+  constructor(leadsRepository: LeadsRepository) {
+    this.leadsRepository = leadsRepository;
+  }
+
   index: Handler = async (req, res, next) => {
     try {
       const query = GetLeadsRequestSchema.parse(req.query);
@@ -21,32 +31,31 @@ export class LeadsController {
         order = "asc",
       } = query;
 
-      const pageNumber = Number(page);
-      const pageSizeNumber = Number(pageSize);
+      const limit = Number(page);
+      const offset = (Number(page) - 1) * limit;
 
-      const where: Prisma.LeadWhereInput = {};
+      const where: LeadWhereParams = {};
 
-      if (name) where.name = { contains: name, mode: "insensitive" };
+      if (name) where.name = { like: name, mode: "insensitive" };
       if (status) where.status = status;
 
-      const leads = await prisma.lead.findMany({
+      const leads = await this.leadsRepository.find({
         where,
-        skip: (pageNumber - 1) * pageSizeNumber,
-        take: pageSizeNumber,
-        orderBy: {
-          [sortBy]: order,
-        },
+        sortBy,
+        order,
+        limit,
+        offset,
       });
 
-      const totalLeads = await prisma.lead.count({ where });
+      const total = await this.leadsRepository.count(where);
 
       res.json({
         data: leads,
         meta: {
-          page: pageNumber,
-          pageSize: pageSizeNumber,
-          total: totalLeads,
-          totalPages: Math.ceil(totalLeads / pageSizeNumber),
+          page: Number(page),
+          pageSize: limit,
+          total,
+          totalPages: Math.ceil(total / limit),
         },
       });
     } catch (error) {
