@@ -30,12 +30,10 @@ export class LeadsController {
         sortBy = "name",
         order = "asc",
       } = query;
-
-      const limit = Number(page);
+      const limit = Number(pageSize);
       const offset = (Number(page) - 1) * limit;
 
       const where: LeadWhereParams = {};
-
       if (name) where.name = { like: name, mode: "insensitive" };
       if (status) where.status = status;
 
@@ -46,8 +44,7 @@ export class LeadsController {
         limit,
         offset,
       });
-
-      const total = await this.leadsRepository.count(where);
+      const total = await this.leadsRepository.count(where);     
 
       res.json({
         data: leads,
