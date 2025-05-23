@@ -91,11 +91,10 @@ export class LeadsController {
   update: Handler = async (req, res, next) => {
     try {
       const body = UpdateLeadRequestSchema.parse(req.body);
+      const id = Number(req.params.id);
 
-      const lead = await prisma.lead.findUnique({
-        where: { id: Number(req.params.id) },
-      });
-
+      const lead = await this.leadsRepository.findById(id);
+      
       if (!lead) throw new HttpError(404, "lead nao encontrado");
 
       if (
@@ -121,10 +120,7 @@ export class LeadsController {
           );
       }
 
-      const updatedLead = await prisma.lead.update({
-        data: body,
-        where: { id: Number(req.params.id) },
-      });
+      const updatedLead = await this.leadsRepository.updateById(id, body);
 
       res.json(updatedLead);
     } catch (error) {
