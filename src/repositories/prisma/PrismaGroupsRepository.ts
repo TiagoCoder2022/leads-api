@@ -38,7 +38,7 @@ export class PrismaGroupsRepository implements GroupsRepository {
     });
   }
 
-  addLead(groupId: number, leadId: number): Promise<Group> {
+  addLeadToGroup(groupId: number, leadId: number): Promise<Group> {
     return prisma.group.update({
       where: {
         id: groupId,
@@ -52,7 +52,7 @@ export class PrismaGroupsRepository implements GroupsRepository {
     });
   }
 
-  removeLead(groupId: number, leadId: number): Promise<Group> {
+  removeLeadFromGroup(groupId: number, leadId: number): Promise<Group> {
     return prisma.group.update({
       where: {
         id: groupId,

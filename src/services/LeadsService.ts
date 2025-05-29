@@ -29,6 +29,7 @@ export class LeadsService {
       order,
       limit,
       offset,
+      include: { groups: true, campaigns: true },
     });
     const total = await this.leadsRepository.count(where); 
 
