@@ -1,23 +1,13 @@
 import { Handler } from "express";
-import { prisma } from "../database";
 import {
   CreateLeadRequestSchema,
   GetLeadsRequestSchema,
   UpdateLeadRequestSchema,
 } from "./schemas/LeadsRequestSchema";
-import { HttpError } from "../erros/HttpError";
-import { Prisma } from "../generated/prisma";
-import {
-  LeadsRepository,
-  LeadWhereParams,
-} from "../repositories/LeadsRepository";
+import { LeadsService } from "../services/LeadsService";
 
 export class LeadsController {
-  private leadsRepository: LeadsRepository;
-
-  constructor(leadsRepository: LeadsRepository) {
-    this.leadsRepository = leadsRepository;
-  }
+  constructor(private readonly leadsService: LeadsService) {}
 
   index: Handler = async (req, res, next) => {
     try {
@@ -30,31 +20,17 @@ export class LeadsController {
         sortBy = "name",
         order = "asc",
       } = query;
-      const limit = Number(pageSize);
-      const offset = (Number(page) - 1) * limit;
 
-      const where: LeadWhereParams = {};
-      if (name) where.name = { like: name, mode: "insensitive" };
-      if (status) where.status = status;
-
-      const leads = await this.leadsRepository.find({
-        where,
+      const result = await this.leadsService.getAllLeadsPaginated({
+        name,
+        status,
+        page: Number(page),
+        pageSize: Number(pageSize),
         sortBy,
         order,
-        limit,
-        offset,
       });
-      const total = await this.leadsRepository.count(where);     
 
-      res.json({
-        data: leads,
-        meta: {
-          page: Number(page),
-          pageSize: limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      });
+      res.json(result);
     } catch (error) {
       next(error);
     }
@@ -63,9 +39,7 @@ export class LeadsController {
   create: Handler = async (req, res, next) => {
     try {
       const body = CreateLeadRequestSchema.parse(req.body);
-      if (!body.status) body.status = "New";
-
-      const newLead = await this.leadsRepository.create(body);      
+      const newLead = await this.leadsService.createLead(body);
 
       res.status(201).json(newLead);
     } catch (error) {
@@ -75,9 +49,8 @@ export class LeadsController {
 
   show: Handler = async (req, res, next) => {
     try {
-      const lead = await this.leadsRepository.findById(Number(req.params.id));     
-
-      if (!lead) throw new HttpError(404, "lead nao encontrado");
+      const id = Number(req.params.id);
+      const lead = await this.leadsService.getLeadById(id);
 
       res.json(lead);
     } catch (error) {
@@ -90,34 +63,7 @@ export class LeadsController {
       const body = UpdateLeadRequestSchema.parse(req.body);
       const id = Number(req.params.id);
 
-      const lead = await this.leadsRepository.findById(id);
-      
-      if (!lead) throw new HttpError(404, "lead nao encontrado");
-
-      if (
-        lead.status === "New" &&
-        body.status !== undefined &&
-        body.status !== "Contacted"
-      ) {
-        throw new HttpError(
-          400,
-          "um novo lead deve ser contatado antes de ter seu status atualizado para outros valores"
-        );
-      }
-
-      if (body.status && body.status === "Archived") {
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - lead.updatedAt.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 180)
-          throw new HttpError(
-            400,
-            "Um lead só pode ser arquivado após 6 meses de inatividade"
-          );
-      }
-
-      const updatedLead = await this.leadsRepository.updateById(id, body);
+      const updatedLead = await this.leadsService.updateLeadById(id, body);
 
       res.json(updatedLead);
     } catch (error) {
@@ -128,13 +74,9 @@ export class LeadsController {
   delete: Handler = async (req, res, next) => {
     try {
       const id = Number(req.params.id);
-      const leadExists = await this.leadsRepository.findById(id);
+      const deletedLead = await this.leadsService.deleteLeadById(id);
 
-      if (!leadExists) throw new HttpError(404, "lead nao encontrado");
-
-      const detetedLead = await this.leadsRepository.deleteById(id);
-
-      res.json({ detetedLead });
+      res.json({ deletedLead });
     } catch (error) {
       next(error);
     }
